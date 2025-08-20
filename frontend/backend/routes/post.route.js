@@ -38,13 +38,16 @@ const upload = multer({ storage });
 // create post
 postRoute.post('/create-post', upload.single('image'), async (req, res, next) => {
   try {
-    const { name, description } = req.body;
+    const { name, scientificName, description, medicalInfo } = req.body;
     const image = req.file ? req.file.filename : null;
 
     const newPost = await PostModel.create({
       name,
+      scientificName,
       description,
-      image
+      medicalInfo,
+      image,
+
     });
 
     res.json(newPost);
@@ -64,7 +67,10 @@ postRoute.post('/update-post/:id', upload.single('image'), async (req, res) => {
 
     const updateData = {
       name: req.body.name,
+      scientificName: req.body.scientificName,
       description: req.body.description,
+      medicalInfo: req.body.medicalInfo,
+
     };
 
     if (req.file) {
