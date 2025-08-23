@@ -1,51 +1,65 @@
 const express = require("express");
-database = require("./database");
-bodyParser = require("body-parser");
-mongoose = require("mongoose");
-cors = require("cors");
-
+const methodOverride = require("method-override");
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const path = require("path");
+const moment = require("moment");
+
+const routeAPI = require("./routes/index.route");
+
+require("dotenv").config();
 
 // connect to mongoDB
-mongoose.Promise = global.Promise;
-mongoose
-    .connect(database.db, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(
-        () => {
-            console.log("Database connected");
-        },
-        (error) => {
-            console.log("Database could't be connectes to:" + error);
-        }
-    );
+const database = require("./config/database");
+database.connect();
 
-const postAPI = require("./routes/post.route");
 const app = express();
-app.use(bodyParser.json());
+const port = process.env.PORT;
+
+// Cấu hình cookies & session
+app.use(cookieParser("KWJFKWEIFHW"));
 app.use(
-    bodyParser.urlencoded({
-        extended: false,
+    session({
+        secret: "KWJFKWEIFHW",
+        resave: false,
+        saveUninitialized: false,
+        cookie: { maxAge: 60000 },
     })
 );
 
-// API
+// Dịch vụ tĩnh (thư mục public)
+app.use(express.static("public"));
+
+// Override phương thức HTTP (PUT, DELETE qua form)
+app.use(methodOverride("_method"));
+
+// API Cho phép CORS
 app.use(cors());
-app.use("/api", postAPI);
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 
-// crearte port
-const port = process.env.PORT || 4000;
-const server = app.listen(port, () => {
-    console.log("Connected to port" + port);
-});
+//Route
+routeAPI(app);
+
+// TinyMCE
+app.use(
+    "/tinymce",
+    express.static(path.join(__dirname, "node_modules", "tinymce"))
+);
+// End TinyMCE
 
 // error hanler
 app.use(function (err, req, res, next) {
     console.error(err.message);
     if (!err.statusCode) err.statusCode = 500;
     res.status(err.statusCode).send(err.message);
+});
+
+// crearte port
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
 });
