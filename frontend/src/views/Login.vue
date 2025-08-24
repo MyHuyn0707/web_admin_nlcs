@@ -36,10 +36,12 @@
 </template>
 
 <script>
-import AuthorizationServiceAdmin from "";
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
+import AuthorizationServiceAdmin from "@/services/authorization.service";
+import { createToastInterface } from "vue-toastification";
+import "vue-toastification/dist/index.css";
+const toast = createToastInterface();
 export default {
+    name: "LoginPage",
     data() {
         return {
             formData: {
@@ -72,7 +74,7 @@ export default {
                             autoClose: 800,
                         });
                         setTimeout(() => {
-                            this.$router.push({ name: "book" });
+                            this.$router.push({ name: "post" });
                         }, 1500);
                         break;
                     default:
@@ -95,7 +97,7 @@ export default {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: url("background_register.png");
+    background: url("@/assets/background_register.png");
     background-size: cover;
 }
 

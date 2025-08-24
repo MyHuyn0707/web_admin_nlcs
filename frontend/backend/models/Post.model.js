@@ -8,11 +8,11 @@ let postSchema = new Schema(
     {
         className: {
             type: String,
-            required: true,
             unique: true,
         },
         name: {
             type: String,
+            require: true,
         },
         scientificName: {
             type: String,

@@ -12,12 +12,12 @@ module.exports.loginPost = async (req, res, next) => {
         const user = await Account.findOne({ email: enteredEmail });
         console.log(user);
         if (!user) {
-            res.json("wrong info1");
+            res.json("wrong info");
             return;
         }
 
         if (!enteredPassword) {
-            res.json("wrong info2");
+            res.json("wrong info");
             return;
         }
 
@@ -27,7 +27,7 @@ module.exports.loginPost = async (req, res, next) => {
         );
 
         if (!isPasswordMatch) {
-            res.json("wrong info3");
+            res.json("wrong info");
             return;
         }
 
@@ -42,8 +42,8 @@ module.exports.loginPost = async (req, res, next) => {
 // [GET]
 module.exports.logout = async (req, res) => {
     res.clearCookie("token");
-    // res.send({
-    //     success: true,
-    // });
+    res.send({
+        success: true,
+    });
     // return res.redirect("http://localhost:3001/login");
 };

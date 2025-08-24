@@ -8,10 +8,17 @@ import Post from "@/views/Post.vue";
 Vue.use(Router);
 
 const router = new Router({
+    mode: "history",
     routes: [
-        { path: "/login", component: Login },
-        { path: "/register", component: Register },
-        { path: "/post", component: Post, meta: { requiresAuth: true } },
+        { path: "/", redirect: "/login" },
+        { path: "/login", name: "login", component: Login },
+        { path: "/register", name: "register", component: Register },
+        {
+            path: "/post",
+            name: "post",
+            component: Post,
+        },
+        { path: "*", redirect: "/login" }, // Catch all route for 404s
     ],
 });
 

@@ -6,11 +6,16 @@ import vuetify from "./plugins/vuetify";
 import "core-js/es/symbol";
 import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-
-Vue.use(VueSweetalert2);
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 Vue.config.productionTip = false;
 Vue.use(VueSweetalert2);
+Vue.use(Toast, {
+    transition: "Vue-Toastification__bounce",
+    maxToasts: 20,
+    newestOnTop: true
+});
 new Vue({
     router,
     store,

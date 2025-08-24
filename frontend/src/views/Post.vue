@@ -7,7 +7,7 @@
                 <span class="hidden-sm-and-down">ADMIN PAGE</span>
             </v-toolbar-title>
             <v-spacer />
-            <v-btn icon>
+            <v-btn icon @click="handleLogout">
                 <v-icon>mdi-logout</v-icon>
             </v-btn>
         </v-app-bar>
@@ -93,7 +93,7 @@
                                                                 "
                                                             >
                                                                 <v-img
-                                                                    :src="`http://localhost:4000/uploads/${postData.image}`"
+                                                                    :src="`http://localhost:3000/uploads/${postData.image}`"
                                                                     max-width="150"
                                                                     max-height="150"
                                                                     contain
@@ -236,7 +236,7 @@
                                         <v-card class="d-flex mb-4">
                                             <!-- Ảnh -->
                                             <v-img
-                                                :src="`http://localhost:4000/uploads/${item.image}`"
+                                                :src="`http://localhost:3000/uploads/${item.image}`"
                                                 max-width="450"
                                                 max-height="450"
                                                 min-width="300"
@@ -344,8 +344,10 @@
 
 <script>
 import axios from "axios";
+import AuthorizationServiceAdmin from "@/services/authorization.service";
 
 export default {
+    name: "PostManagement",
     data: () => ({
         mini: false,
         dialog: false,
@@ -398,7 +400,7 @@ export default {
         imagePreview() {
             if (this.selectedImage) return this.imagePreviewURL;
             if (this.postData.image)
-                return `http://localhost:4000/uploads/${this.postData.image}`;
+                return `http://localhost:3000/uploads/${this.postData.image}`;
             return null;
         },
     },
@@ -414,9 +416,52 @@ export default {
     },
 
     methods: {
+        async handleLogout() {
+            // Show confirmation dialog
+            const result = await this.$swal({
+                title: "Đăng xuất",
+                text: "Bạn có chắc chắn muốn đăng xuất?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Đồng ý",
+                cancelButtonText: "Hủy",
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    // Call server logout endpoint
+                    await AuthorizationServiceAdmin.logOut();
+
+                    // Clear any stored auth data (tokens, etc.)
+                    localStorage.removeItem("token");
+
+                    // Show success message
+                    await this.$swal({
+                        icon: "success",
+                        title: "Đã đăng xuất thành công",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+
+                    // Redirect to login page
+                    this.$router.push({ name: "login" });
+                } catch (error) {
+                    console.error("Logout error:", error);
+                    this.$swal({
+                        icon: "error",
+                        title: "Lỗi đăng xuất",
+                        text: "Đã xảy ra lỗi khi đăng xuất. Vui lòng thử lại.",
+                        confirmButtonText: "Đóng",
+                    });
+                }
+            }
+        },
+
         loadPosts() {
             axios
-                .get("http://localhost:4000/api")
+                .get("http://localhost:3000/post/get-post")
                 .then((res) => {
                     this.posts = [...res.data];
                 })
@@ -470,7 +515,7 @@ export default {
         },
 
         createPost() {
-            const apiURL = "http://localhost:4000/api/create-post";
+            const apiURL = "http://localhost:3000/post/create-post";
             const formData = new FormData();
             formData.append("name", this.postData.name);
             formData.append("scientificName", this.postData.scientificName);
@@ -502,7 +547,7 @@ export default {
         },
 
         updatePost() {
-            const apiURL = `http://localhost:4000/api/update-post/${this.postData._id}`;
+            const apiURL = `http://localhost:3000/post/update-post/${this.postData._id}`;
             const formData = new FormData();
             formData.append("name", this.postData.name);
             formData.append("scientificName", this.postData.scientificName);
@@ -515,7 +560,7 @@ export default {
             }
 
             axios
-                .post(apiURL, formData, {
+                .put(apiURL, formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then(() => {
@@ -541,7 +586,7 @@ export default {
                 cancelButtonText: "Hủy",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const apiURL = `http://localhost:4000/api/delete-post/${id}`;
+                    const apiURL = `http://localhost:3000/post/delete-post/${id}`;
                     axios
                         .delete(apiURL)
                         .then(() => {

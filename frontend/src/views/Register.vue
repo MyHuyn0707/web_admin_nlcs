@@ -42,7 +42,9 @@
 
 <script>
 import { defineComponent } from "vue";
-export default defineComponent({});
+export default defineComponent({
+    name: "RegisterPage",
+});
 </script>
 
 <style lang="scss" scoped>
@@ -59,7 +61,7 @@ $color-fade: #666;
 }
 
 .form-wrap {
-    background-image: url("background_register.png");
+    background-image: url("@/assets/background_register.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -80,7 +82,7 @@ $color-fade: #666;
         z-index: 3;
 
         &__left {
-            background-image: url("background_register1.jpg");
+            background-image: url("@/assets/background_register1.jpg");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
